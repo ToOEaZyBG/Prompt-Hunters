@@ -1,0 +1,65 @@
+# Prompt Hunters - Документация на проекта
+
+## Описание на проекта
+Prompt Hunters е уеб приложение за продажба на AI промптове, вдъхновено от PromptBase. 
+Платформата позволява на потребителите да купуват и продават промптове за различни AI модели.
+
+## Структура на проекта
+
+### Batch файлове за setup:
+1. 1_create_structure.bat
+   - Създава основната структура на директориите
+   - Организира backend, frontend и admin частите
+   - Създава необходимите поддиректории за всеки компонент
+
+2. 2_install_dependencies.bat
+   - Инсталира всички необходими npm пакети
+   - Настройва development среда за backend (Express + TypeScript)
+   - Настройва admin панела (React Admin)
+   - Настройва frontend частта (React + Vite)
+
+3. 2.5_setup_scripts.bat
+   - Конфигурира npm скриптове за стартиране
+   - Създава TypeScript конфигурация
+   - Настройва build процеса
+
+4. 3_init_git.bat
+   - Инициализира Git хранилището
+   - Създава .gitignore файл
+   - Настройва основни Git branch-ове
+
+5. 4_create_env.bat
+   - Създава .env файлове за различните части на приложението
+   - Настройва основни environment променливи
+
+6. 5_start_dev.bat
+   - Стартира development сървърите
+   - Управлява портовете и процесите
+
+## Основни директории:
+/backend
+  /src
+    /config      - Конфигурационни файлове
+    /controllers - Контролери за API endpoints
+    /models      - Модели за базата данни
+    /middlewares - Middleware функции
+    /routes      - API маршрути
+    /types       - TypeScript типове
+    /utils       - Помощни функции
+
+/frontend
+  /src
+    /components  - React компоненти
+    /pages       - Страници на приложението
+    /services    - API услуги
+    /assets      - Статични файлове
+    /hooks       - Custom React hooks
+    /contexts    - React контексти
+    /styles      - CSS/SCSS файлове
+    /utils       - Помощни функции
+
+/admin
+  /src
+    /components  - Компоненти за админ панела
+    /resources   - React-admin ресурси
+    /types       - TypeScript типове 

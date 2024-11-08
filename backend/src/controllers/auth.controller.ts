@@ -1,26 +1,33 @@
 import { Request, Response } from 'express';
-import { validationResult } from 'express-validator';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { getDatabase } from '../config/database';
+import formidable from 'formidable';
 import path from 'path';
-import fs from 'fs';
+import fs from 'fs-extra';
+
+interface User {
+  id: number;
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+  avatar_url?: string;
+  avatar_path?: string;
+}
+
+interface UserAvatar {
+  avatar_path?: string;
+}
 
 export const register = async (req: Request, res: Response) => {
+  const { email, password, firstName, lastName } = req.body;
+
   try {
-    console.log('Register request received:', req.body);
-
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { email, password, firstName, lastName } = req.body;
     const db = await getDatabase();
 
     // Проверка дали имейлът вече съществува
-    const existingUser = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    const existingUser = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as User | undefined;
     if (existingUser) {
       console.log('User already exists:', email);
       return res.status(400).json({ message: 'Email already exists' });
@@ -30,107 +37,84 @@ export const register = async (req: Request, res: Response) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    console.log('Creating new user...');
-
     // Създаване на потребител
-    const result = await db.run(
-      'INSERT INTO users (email, password, firstName, lastName) VALUES (?, ?, ?, ?)',
-      [email, hashedPassword, firstName, lastName]
+    const stmt = db.prepare(
+      'INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)'
     );
+    const result = stmt.run(email, hashedPassword, firstName, lastName);
 
-    console.log('User created successfully:', result);
-
-    const user = {
-      id: result.lastID,
-      email,
-      firstName,
-      lastName
-    };
-
-    // Генериране на JWT токен
+    // Създаване на JWT token
     const token = jwt.sign(
-      { id: user.id },
-      process.env.JWT_SECRET || 'default_secret',
-      { expiresIn: '24h' }
+      { id: result.lastInsertRowid },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '1d' }
     );
 
-    console.log('Registration successful for:', email);
-
-    res.status(201).json({
+    res.json({
       token,
-      user
+      user: {
+        id: result.lastInsertRowid,
+        email,
+        firstName,
+        lastName
+      }
     });
-
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ message: 'Server error during registration' });
+    res.status(500).json({ message: 'Error registering user' });
   }
 };
 
 export const login = async (req: Request, res: Response) => {
-  try {
-    console.log('Login attempt with:', req.body);
-    
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      console.log('Validation errors:', errors.array());
-      return res.status(400).json({ errors: errors.array() });
-    }
+  const { email, password } = req.body;
 
-    const { email, password } = req.body;
+  try {
     const db = await getDatabase();
 
     // Намиране на потребителя
-    const user = await db.get('SELECT * FROM users WHERE email = ?', [email]);
+    const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as User | undefined;
     console.log('Found user in database:', user);
     
     if (!user) {
-      console.log('User not found in database');
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
     // Проверка на паролата
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match result:', isMatch);
-    
     if (!isMatch) {
-      console.log('Password does not match');
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Генериране на JWT токен
+    // Създаване на JWT token
     const token = jwt.sign(
       { id: user.id },
-      process.env.JWT_SECRET || 'default_secret',
-      { expiresIn: '24h' }
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '1d' }
     );
-
-    console.log('Generated token:', token);
-    console.log('Login successful for:', email);
 
     res.json({
       token,
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName
+        firstName: user.first_name,
+        lastName: user.last_name,
+        avatarUrl: user.avatar_url
       }
     });
-
   } catch (error) {
     console.error('Login error:', error);
-    res.status(500).json({ message: 'Server error during login' });
+    res.status(500).json({ message: 'Error logging in' });
   }
 };
 
 export const changePassword = async (req: Request, res: Response) => {
-  try {
-    const { currentPassword, newPassword } = req.body;
-    const userId = req.user?.id; // Ще добавим middleware за извличане на потребителя от токена
+  const { currentPassword, newPassword } = req.body;
+  const userId = req.user?.id;
 
+  try {
     const db = await getDatabase();
-    const user = await db.get('SELECT * FROM users WHERE id = ?', [userId]);
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId) as User | undefined;
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -139,7 +123,7 @@ export const changePassword = async (req: Request, res: Response) => {
     // Проверка на текущата парола
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: 'Current password is incorrect' });
+      return res.status(401).json({ message: 'Current password is incorrect' });
     }
 
     // Хеширане на новата парола
@@ -147,75 +131,82 @@ export const changePassword = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
     // Обновяване на паролата
-    await db.run(
-      'UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [hashedPassword, userId]
+    const stmt = db.prepare(
+      'UPDATE users SET password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
     );
+    stmt.run(hashedPassword, userId);
 
     res.json({ message: 'Password updated successfully' });
   } catch (error) {
     console.error('Change password error:', error);
-    res.status(500).json({ message: 'Server error during password change' });
+    res.status(500).json({ message: 'Error changing password' });
   }
 };
 
 export const uploadAvatar = async (req: Request, res: Response) => {
   try {
-    console.log('Upload avatar request:', req.file);
+    const form = formidable({
+      uploadDir: path.join(__dirname, '../../uploads/avatars'),
+      keepExtensions: true,
+      maxFileSize: 5 * 1024 * 1024, // 5MB
+      filter: ({ mimetype }: { mimetype: string | null }) => {
+        return !!(mimetype && mimetype.includes('image'));
+      }
+    });
+
+    const [fields, files] = await form.parse(req);
+    const file = files.avatar?.[0];
     
-    if (!req.file) {
+    if (!file) {
       return res.status(400).json({ message: 'No file uploaded' });
     }
 
-    const db = await getDatabase();
-    
-    // Генерираме публичен URL за аватара (без baseUrl)
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-    const avatarPath = req.file.filename;
-    
-    console.log('Avatar URL:', avatarUrl);
-    console.log('Avatar path:', avatarPath);
-    
-    await db.run(
-      'UPDATE users SET avatar_url = ?, avatar_path = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [avatarUrl, avatarPath, req.user?.id]
-    );
+    const avatarUrl = `/uploads/avatars/${path.basename(file.filepath)}`;
+    const avatarPath = path.basename(file.filepath);
 
-    const updatedUser = await db.get('SELECT * FROM users WHERE id = ?', [req.user?.id]);
-    console.log('Updated user:', updatedUser);
+    // Обновяваме базата данни
+    const db = await getDatabase();
+    const stmt = db.prepare(
+      'UPDATE users SET avatar_url = ?, avatar_path = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+    );
+    stmt.run(avatarUrl, avatarPath, req.user?.id);
 
     res.json({ 
       message: 'Avatar uploaded successfully',
-      avatar: {
-        url: avatarUrl,
-        path: avatarPath
-      }
+      avatarUrl
     });
+
   } catch (error) {
-    console.error('Avatar upload error:', error);
-    res.status(500).json({ message: 'Server error during avatar upload' });
+    console.error('Upload error:', error);
+    res.status(500).json({ message: 'Error uploading avatar' });
   }
 };
 
 export const deleteAvatar = async (req: Request, res: Response) => {
   try {
     const db = await getDatabase();
-    const user = await db.get('SELECT avatar_path FROM users WHERE id = ?', [req.user?.id]);
+    const stmt = db.prepare('SELECT avatar_path FROM users WHERE id = ?');
+    const user = stmt.get(req.user?.id) as UserAvatar | undefined;
 
     if (user?.avatar_path) {
-      // Изтриваме файла
       const filePath = path.join(__dirname, '../../uploads/avatars', user.avatar_path);
-      fs.unlinkSync(filePath);
+      await fs.remove(filePath);
     }
 
-    await db.run(
-      'UPDATE users SET avatar_url = NULL, avatar_path = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
-      [req.user?.id]
+    const updateStmt = db.prepare(
+      'UPDATE users SET avatar_url = NULL, avatar_path = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
     );
+    updateStmt.run(req.user?.id);
 
     res.json({ message: 'Avatar deleted successfully' });
   } catch (error) {
-    console.error('Avatar delete error:', error);
-    res.status(500).json({ message: 'Server error during avatar deletion' });
+    console.error('Delete avatar error:', error);
+    res.status(500).json({ message: 'Error deleting avatar' });
   }
-}; 
+};
+
+export const updateAvatar = async (userId: string, avatarPath: string) => {
+  const db = await getDatabase();
+  const stmt = db.prepare('UPDATE users SET avatar_path = ? WHERE id = ?');
+  stmt.run(avatarPath, userId);
+};

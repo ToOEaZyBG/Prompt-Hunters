@@ -2,30 +2,62 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { getDatabase } from '../config/database';
 
+// Дефинираме интерфейс за User от базата данни
+interface DBUser {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  password: string;
+  avatar_url?: string;
+  avatar_path?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+// Разширяваме типа Request
+declare global {
+  namespace Express {
+    interface Request {
+      user?: {
+        id: number;
+        email: string;
+        firstName: string;
+        lastName: string;
+      };
+    }
+  }
+}
+
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    console.log('Auth headers:', req.headers);
-    const token = req.headers.authorization?.split(' ')[1];
-    
-    if (!token) {
-      console.log('No token provided');
+    // Вземаме token от header-а
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
       return res.status(401).json({ message: 'No token provided' });
     }
 
-    console.log('Verifying token:', token);
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default_secret') as { id: number };
-    console.log('Decoded token:', decoded);
-
+    const token = authHeader.split(' ')[1];
+    
+    // Декодираме token-а
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as jwt.JwtPayload;
+    
+    // Проверяваме дали потребителят съществува в базата
     const db = await getDatabase();
-    const user = await db.get('SELECT id, email, firstName, lastName FROM users WHERE id = ?', [decoded.id]);
-    console.log('Found user:', user);
-
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(decoded.id) as DBUser | undefined;
+    
     if (!user) {
-      console.log('User not found for token');
-      return res.status(401).json({ message: 'Invalid token' });
+      return res.status(401).json({ message: 'User not found' });
     }
 
-    req.user = user;
+    // Добавяме user към request обекта
+    req.user = {
+      id: user.id,
+      email: user.email,
+      firstName: user.first_name,
+      lastName: user.last_name
+    };
+
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);

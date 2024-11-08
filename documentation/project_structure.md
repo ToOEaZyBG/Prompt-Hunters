@@ -741,7 +741,7 @@ frontend/
 │   │   ├── claude.svg     # Икона за Claude AI (2024-11-08)
 │   │   ├── dalle.svg      # Икона за DALL-E (2024-11-08)
 │   │   ├── gpt.svg        # Икона за GPT (2024-11-08)
-│   │   └── ...           
+���   │   └── ...           
 │   └── pattern.svg        # Background pattern (2024-11-08)
 │
 ├── src/
@@ -758,7 +758,7 @@ frontend/
 │   │   ├── auth/         # Автентикация страници
 │   │   │   ── Login.tsx # Вход (2024-11-08)
 │   │   │   └── ...
-│   │   ├── Home.tsx      # Начална страница (2024-11-08)
+│   │   ── Home.tsx      # Начална страница (2024-11-08)
 │   │   └── ...
 │   │
 │   ├── constants/        # Константи
@@ -2195,3 +2195,59 @@ interface Category {
 ```
 
 [Продължава с още детайли за админ панела...]
+
+## Recent Updates (08.11.2024)
+
+### File System Changes
+- Removed: backend/src/types/multer.d.ts
+- Added: backend/src/types/formidable.d.ts
+- Added: .vscode/settings.json for VS Code optimization
+- Added: start-vscode.bat for enhanced VS Code performance
+
+### Dependencies Updates
+- Removed: multer, @types/multer
+- Added: formidable@3.5.2, @types/formidable@3.4.5
+- Added: better-sqlite3@9.4.3, @types/better-sqlite3@7.6.11
+- Updated: sqlite3 to version 5.1.7
+- Updated: jsonwebtoken to version 9.0.2
+
+### File Updates
+- auth.controller.ts: 
+  - Replaced multer with formidable
+  - Added User and UserAvatar interfaces
+  - Updated database queries to use better-sqlite3
+  - Improved error handling
+
+- auth.routes.ts:
+  - Removed multer middleware
+  - Added formidable file upload handling
+  - Added proper TypeScript interfaces
+  - Improved error handling
+
+- auth.middleware.ts:
+  - Added DBUser interface
+  - Updated database queries for better-sqlite3
+  - Improved type safety
+
+- database.ts:
+  - Switched to better-sqlite3
+  - Added proper TypeScript types
+  - Improved database initialization
+
+- index.ts:
+  - Added CORS configuration
+  - Added root route handler
+  - Improved error handling
+  - Added proper TypeScript types
+
+### Configuration Updates
+- VS Code:
+  - Added memory optimization settings
+  - Added TypeScript performance settings
+  - Added search exclusions
+  - Added file watching optimizations
+
+- TypeScript:
+  - Updated tsconfig.json for better type checking
+  - Added new type definitions
+  - Improved type safety across the project

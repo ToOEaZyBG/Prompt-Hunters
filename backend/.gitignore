@@ -1,2 +1,7 @@
 # ... други игнорирани файлове
 /uploads 
+
+# Database files
+database.sqlite
+*.sqlite
+*.sqlite3

@@ -741,7 +741,7 @@ frontend/
 │   │   ├── claude.svg     # Икона за Claude AI (2024-11-08)
 │   │   ├── dalle.svg      # Икона за DALL-E (2024-11-08)
 │   │   ├── gpt.svg        # Икона за GPT (2024-11-08)
-���   │   └── ...           
+   │   └── ...           
 │   └── pattern.svg        # Background pattern (2024-11-08)
 │
 ├── src/
@@ -2251,3 +2251,75 @@ interface Category {
   - Updated tsconfig.json for better type checking
   - Added new type definitions
   - Improved type safety across the project
+
+### 19.4 База данни
+
+#### Database Configuration
+```typescript
+// Път: /backend/src/config/database.ts
+// Използва better-sqlite3 за по-добра производителност и типова безопасност
+
+import Database from 'better-sqlite3';
+
+let db: Database.Database | null = null;
+
+export async function getDatabase() {
+  if (db) return db;
+  
+  const dbPath = path.join(__dirname, '../../database.sqlite');
+  db = new Database(dbPath, { verbose: console.log });
+  
+  // Създаване на таблици
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      first_name TEXT NOT NULL,
+      last_name TEXT NOT NULL,
+      avatar_url TEXT,
+      avatar_path TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+  `);
+  
+  return db;
+}
+```
+
+#### Database Operations
+```typescript
+// Примери за използване на better-sqlite3
+
+// Select
+const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+
+// Insert
+const stmt = db.prepare(
+  'INSERT INTO users (email, password, first_name, last_name) VALUES (?, ?, ?, ?)'
+);
+const result = stmt.run(email, hashedPassword, firstName, lastName);
+
+// Update
+const updateStmt = db.prepare(
+  'UPDATE users SET avatar_url = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?'
+);
+updateStmt.run(avatarUrl, userId);
+
+// Transaction
+const transaction = db.transaction((userId, newData) => {
+  // Multiple operations in one transaction
+});
+```
+
+#### Предимства на better-sqlite3
+1. По-добра производителност от sqlite3
+2. Вградена поддръжка на транзакции
+3. Prepared statements за защита от SQL injection
+4. Пълна TypeScript поддръжка
+5. Синхронно API за по-чист код
+6. По-малко зависимости
+7. Активно поддържан проект
+
+[останалата част от файла остава непроменена...]

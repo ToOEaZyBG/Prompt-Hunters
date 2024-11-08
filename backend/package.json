@@ -21,7 +21,6 @@
     "formidable": "^3.5.2",
     "fs-extra": "^11.2.0",
     "jsonwebtoken": "^9.0.2",
-    "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0"
   },

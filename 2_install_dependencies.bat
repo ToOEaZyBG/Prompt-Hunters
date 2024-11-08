@@ -14,7 +14,7 @@ cd backend
 call npm init -y
 
 :: Backend dependencies
-call npm install express cors dotenv bcryptjs jsonwebtoken sqlite sqlite3 swagger-jsdoc swagger-ui-express
+call npm install express cors dotenv bcryptjs jsonwebtoken better-sqlite3 swagger-jsdoc swagger-ui-express
 call npm install -D typescript @types/node @types/express @types/cors @types/bcryptjs @types/jsonwebtoken @types/sqlite3 @types/swagger-jsdoc @types/swagger-ui-express ts-node-dev
 
 :: Admin UI setup

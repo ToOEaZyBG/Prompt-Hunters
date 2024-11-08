@@ -37,6 +37,7 @@ yarn-error.log*
 ehthumbs.db
 Thumbs.db
 
-# Database
+# Database files
+database.sqlite
 *.sqlite
 *.sqlite3

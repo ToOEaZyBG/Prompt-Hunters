@@ -7,34 +7,109 @@ Prompt Hunters е уеб приложение за продажба на AI пр
 ## Структура на проекта
 
 ### Batch файлове за setup:
-1. 1_create_structure.bat
+1. 1_create_structure.bat ✅ (Изпълнен)
    - Създава основната структура на директориите
    - Организира backend, frontend и admin частите
    - Създава необходимите поддиректории за всеки компонент
+   
+   Създадени директории:
+   - /backend/src с поддиректории за config, controllers, models, middlewares, routes, types, utils
+   - /backend/admin/src с поддиректории за components, resources, types
+   - /frontend/src с поддиректории за components, pages, services, assets, hooks, contexts, styles, utils
+   - Общи директории: shared, database, documentation, testing, Changes
 
-2. 2_install_dependencies.bat
-   - Инсталира всички необходими npm пакети
-   - Настройва development среда за backend (Express + TypeScript)
-   - Настройва admin панела (React Admin)
-   - Настройва frontend частта (React + Vite)
+2. 2_install_dependencies.bat ✅ (Изпълнен)
+   Инсталирани пакети:
+   
+   Backend:
+   - express, cors, dotenv: За REST API сървър
+   - bcryptjs, jsonwebtoken: За автентикация и сигурност
+   - sqlite, sqlite3: За база данни
+   - swagger-jsdoc, swagger-ui-express: За API документация
+   - typescript и съответните @types: За type safety
+   
+   Admin UI:
+   - react-admin: За админ интерфейса
+   - @mui/material: За UI компоненти
+   - recharts: За визуализация на данни
+   - ra-data-json-server: За връзка с REST API
+   
+   Frontend:
+   - react, react-dom с TypeScript
+   - @mui/material: За UI компоненти
+   - @reduxjs/toolkit, react-redux: За state management
+   - react-router-dom: За routing
+   - axios: За API заявки
+   - formik, yup: За форми и валидация
 
-3. 2.5_setup_scripts.bat
-   - Конфигурира npm скриптове за стартиране
-   - Създава TypeScript конфигурация
-   - Настройва build процеса
+3. 2.5_setup_scripts.bat ✅ (Изпълнен)
+   Конфигурирани скриптове:
+   
+   Backend:
+   - npm run start: Стартира production сървъра
+   - npm run dev: Стартира development сървъра с hot-reload
+   - npm run build: Компилира TypeScript кода
+   - npm run test: Изпълнява тестовете
+   
+   Admin UI:
+   - npm run dev: Стартира development сървъра на порт 3001
+   - npm run build: Билдва приложението
+   - npm run serve: Preview на билднатото приложение
+   
+   TypeScript конфигурация:
+   - target: ES6
+   - module: CommonJS
+   - strict mode: Включен
+   - source maps: Включени
+   - output директория: ./dist
+   - root директория: ./src
 
-4. 3_init_git.bat
-   - Инициализира Git хранилището
-   - Създава .gitignore файл
-   - Настройва основни Git branch-ове
+4. 3_init_git.bat ✅ (Изпълнен)
+   Git конфигурация:
+   - Инициализирано Git хранилище
+   - Създаден .gitignore файл със следните игнорирани файлове и директории:
+     * node_modules/
+     * build/ и dist/
+     * .env файлове
+     * logs
+     * SQLite бази данни
+     * OS специфични файлове (.DS_Store)
+   - Създаден initial commit
+   - Настроен main branch
+   - Създаден dev branch
+   - Добавен remote origin към GitHub репозитори
 
-5. 4_create_env.bat
-   - Създава .env файлове за различните части на приложението
-   - Настройва основни environment променливи
+5. 4_create_env.bat ✅ (Изпълнен)
+   Създадени .env файлове:
 
-6. 5_start_dev.bat
-   - Стартира development сървърите
-   - Управлява портовете и процесите
+   Backend (.env):
+   - NODE_ENV=development
+   - PORT=3000
+   - JWT_SECRET=pm_tool_secret_key
+   - ADMIN_USERNAME=TooEaZy
+   - ADMIN_EMAIL=TooEaZy@example.com
+   - ADMIN_PASSWORD=123qwe!
+
+   Admin UI (.env):
+   - VITE_API_URL=http://localhost:3000/api
+   - VITE_ADMIN_URL=http://localhost:3001
+
+   Frontend (.env):
+   - VITE_API_URL=http://localhost:3000/api
+   - VITE_ADMIN_URL=http://localhost:3001
+
+6. 5_start_dev.bat ✅ (Изпълнен)
+   Development сървъри:
+   - Автоматично освобождаване на портове 3000 и 3001 ако са заети
+   - Стартиране на Backend сървър на http://localhost:3000
+   - Стартиране на Admin UI на http://localhost:3001
+   - Стартиране на Frontend на http://localhost:5173
+   - Достъп до API документация на http://localhost:3000/api-docs
+   
+   Процес на стартиране:
+   - Първо стартира backend сървъра
+   - След 10 секунди стартира admin UI
+   - След още 10 секунди стартира frontend частта
 
 ## Основни директории:
 /backend

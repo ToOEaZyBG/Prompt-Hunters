@@ -1,15 +1,15 @@
 # Dependencies
 node_modules/
-.pnp
+.pnp/
 .pnp.js
-ECHO is off.
+
 # Testing
 coverage/
-ECHO is off.
+
 # Production
 build/
 dist/
-ECHO is off.
+
 # Misc
 .DS_Store
 .env
@@ -17,12 +17,26 @@ ECHO is off.
 .env.development.local
 .env.test.local
 .env.production.local
-ECHO is off.
-# Logs
+
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-ECHO is off.
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
 # Database
 *.sqlite
 *.sqlite3

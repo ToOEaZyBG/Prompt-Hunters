@@ -5,16 +5,7 @@ import { getDatabase } from '../config/database';
 import formidable from 'formidable';
 import path from 'path';
 import fs from 'fs-extra';
-
-interface User {
-  id: number;
-  email: string;
-  password: string;
-  first_name: string;
-  last_name: string;
-  avatar_url?: string;
-  avatar_path?: string;
-}
+import { User } from '../types/user';
 
 interface UserAvatar {
   avatar_path?: string;
@@ -66,26 +57,23 @@ export const register = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+  const { email } = req.body;
 
   try {
     const db = await getDatabase();
-
-    // Намиране на потребителя
     const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email) as User | undefined;
-    console.log('Found user in database:', user);
+    
+    console.log('Login attempt processed');
     
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Проверка на паролата
-    const isMatch = await bcrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Създаване на JWT token
     const token = jwt.sign(
       { id: user.id },
       process.env.JWT_SECRET || 'your-secret-key',
@@ -97,13 +85,14 @@ export const login = async (req: Request, res: Response) => {
       user: {
         id: user.id,
         email: user.email,
-        firstName: user.first_name,
-        lastName: user.last_name,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        role: user.role,
         avatarUrl: user.avatar_url
       }
     });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Login error occurred');
     res.status(500).json({ message: 'Error logging in' });
   }
 };

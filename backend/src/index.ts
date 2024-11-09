@@ -11,21 +11,26 @@ dotenv.config();
 
 const app = express();
 
-// CORS конфигурация
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000'], // Добавяме и двата порта
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Първо слагаме CORS middleware
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
-// Middleware
+// След това останалите middleware-и
 app.use(express.json());
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to Prompt Hunters API' });
-});
+// Routes
+app.use('/api/auth', authRoutes);
 
 // Swagger конфигурация
 const swaggerOptions = {
@@ -48,9 +53,6 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
-
-// Routes
-app.use('/api/auth', authRoutes);
 
 // Статични файлове
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

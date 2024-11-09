@@ -24,6 +24,7 @@ import LoginIcon from '@mui/icons-material/Login';
 import { designTokens } from '../../theme/designSystem';
 import authService from '../../services/auth.service';
 import { useAuth } from '../../contexts/AuthContext';
+import { ASSETS } from '../../constants/paths';
 
 const validationSchema = Yup.object({
   email: Yup.string()
@@ -48,22 +49,14 @@ const Login = () => {
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        console.log('Attempting login with:', values);
-        
         const response = await authService.login({
           email: values.email,
           password: values.password,
         });
-
-        console.log('Login successful:', response);
         
-        // Използваме контекста за логин
         login(response.token, response.user);
-        
-        // Пренасочване към началната страница
         navigate('/');
       } catch (error: any) {
-        console.error('Login failed:', error);
         setError(error.message || 'Login failed');
       } finally {
         setSubmitting(false);
@@ -85,6 +78,15 @@ const Login = () => {
         alignItems: 'center',
         py: { xs: 8, md: 12 },
         background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: `url("${ASSETS.patterns.default}") repeat`,
+          opacity: 0.05,
+          zIndex: 1,
+        }
       }}
     >
       <Container maxWidth="sm">

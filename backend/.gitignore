@@ -2,6 +2,6 @@
 /uploads 
 
 # Database files
-database.sqlite
-*.sqlite
-*.sqlite3
+/database/*.sqlite
+/database/*.sqlite3
+/database/*.db

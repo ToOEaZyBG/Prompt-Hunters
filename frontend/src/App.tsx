@@ -3,15 +3,18 @@ import { ThemeProvider, CssBaseline } from '@mui/material';
 import theme from './theme/index';
 import AppRoutes from './routes/index';
 import { AuthProvider } from './contexts/AuthContext';
+import { BrowserRouter } from 'react-router-dom';
 
 const App = () => {
   return (
-    <AuthProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AppRoutes />
-      </ThemeProvider>
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <AppRoutes />
+        </ThemeProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 };
 

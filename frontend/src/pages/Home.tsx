@@ -17,6 +17,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import { AI_MODELS, getModelIcon } from '../constants/categories';
 import NewsletterSection from '../components/newsletter/NewsletterSection';
 import { designTokens } from '../theme/designSystem';
+import { ASSETS } from '../constants/paths';
 
 const Home = () => {
   const theme = useTheme();
@@ -50,7 +51,7 @@ const Home = () => {
             left: 0,
             right: 0,
             bottom: 0,
-            background: 'url("/pattern.svg") repeat',
+            background: `url("${ASSETS.patterns.default}") repeat`,
             opacity: 0.05,
             zIndex: 1,
           }

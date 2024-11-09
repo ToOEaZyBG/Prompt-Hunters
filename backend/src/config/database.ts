@@ -8,7 +8,7 @@ export async function getDatabase() {
     return db;
   }
 
-  const dbPath = path.join(__dirname, '../../database.sqlite');
+  const dbPath = path.join(__dirname, '../../database/database.sqlite');
   console.log('Opening database at:', dbPath);
 
   db = new Database(dbPath, { verbose: console.log });
@@ -23,6 +23,7 @@ export async function getDatabase() {
       last_name TEXT NOT NULL,
       avatar_url TEXT,
       avatar_path TEXT,
+      role TEXT DEFAULT 'user',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );

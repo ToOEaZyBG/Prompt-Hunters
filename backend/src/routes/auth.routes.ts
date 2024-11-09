@@ -79,4 +79,10 @@ router.post('/avatar', authMiddleware, async (req: Request, res: Response, next:
   }
 });
 
+// Добавяме нов route за проверка на токена
+router.get('/check-token', authMiddleware, (req, res) => {
+  // Ако authMiddleware пропусне заявката, значи токенът е валиден
+  res.json({ valid: true });
+});
+
 export default router; 

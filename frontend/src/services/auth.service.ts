@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
 export interface LoginCredentials {
   email: string;
@@ -20,7 +20,7 @@ export interface AuthResponse {
 // Добавяме axios interceptor за автоматично добавяне на токена
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -39,7 +39,7 @@ class AuthService {
     lastName: string;
   }): Promise<AuthResponse> {
     try {
-      const url = `${API_URL}/auth/register`;
+      const url = `${API_URL}/register`;
       console.log('Sending registration request to:', url);
       console.log('With data:', userData);
 
@@ -63,55 +63,62 @@ class AuthService {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      console.log('Attempting login with:', credentials);
-      console.log('API URL:', `${API_URL}/auth/login`);
+      console.log('Login attempt for:', credentials.email);
 
-      const response = await axios.post(`${API_URL}/auth/login`, credentials);
+      const response = await axios.post(`${API_URL}/auth/login`, credentials, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        withCredentials: true
+      });
       
-      console.log('Login response:', response.data);
-
       if (response.data.token) {
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('user', JSON.stringify(response.data.user));
+        sessionStorage.setItem('token', response.data.token);
+        sessionStorage.setItem('user', JSON.stringify(response.data.user));
         axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
       }
       
       return response.data;
     } catch (error: any) {
-      console.error('Full login error:', error);
-      if (error.response) {
-        console.error('Login error response:', error.response.data);
-        console.error('Login error status:', error.response.status);
-        console.error('Login error headers:', error.response.headers);
-        throw new Error(error.response.data.message || 'Invalid email or password');
-      } else if (error.request) {
-        console.error('Login request error:', error.request);
-        throw new Error('No response from server. Please try again later.');
-      } else {
-        console.error('Login error:', error.message);
-        throw new Error('Error occurred while logging in. Please try again.');
-      }
+      console.error('Login failed');
+      throw error;
     }
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
   }
 
   getCurrentUser() {
-    const userStr = localStorage.getItem('user');
+    const userStr = sessionStorage.getItem('user');
     if (userStr) return JSON.parse(userStr);
     return null;
   }
 
   getToken() {
-    return localStorage.getItem('token');
+    return sessionStorage.getItem('token');
   }
 
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  async checkTokenValidity(): Promise<boolean> {
+    const token = this.getToken();
+    if (!token) return false;
+    
+    try {
+      // Правим заявка към backend-а за да проверим токена
+      await axios.get(`${API_URL}/check-token`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 

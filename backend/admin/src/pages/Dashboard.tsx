@@ -1,196 +1,155 @@
-import React from 'react';
-import { 
-  Card, 
-  CardContent, 
-  Box,
-  Typography,
-  useTheme,
-  alpha,
-  Paper,
-  Stack
-} from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2'; // Използваме новия Grid компонент
+import { Box, Grid, Typography, useTheme } from '@mui/material';
+import { useGetList } from 'react-admin';
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
   BarElement,
   Title,
   Tooltip,
   Legend,
-  ArcElement,
-  ChartData,
-  ChartOptions
 } from 'chart.js';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
+import PeopleIcon from '@mui/icons-material/People';
+import CodeIcon from '@mui/icons-material/Code';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import { StatsCard, ActivityList } from '../components/dashboard';
+import { StatsRecord, UserActivity } from '../types';
 
-// Регистрираме компонентите на Chart.js
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
   BarElement,
   Title,
   Tooltip,
-  Legend,
-  ArcElement
+  Legend
 );
-
-// Добавяме типове за данните на графиките
-interface ChartDatasets {
-  label?: string;
-  data: number[];
-  backgroundColor?: string | string[];
-  borderColor?: string;
-}
-
-interface ChartProps {
-  labels: string[];
-  datasets: ChartDatasets[];
-}
 
 const Dashboard = () => {
   const theme = useTheme();
 
-  // Данни за промптите по модели
-  const promptsByModel: ChartProps = {
-    labels: ['GPT', 'Claude', 'Midjourney', 'DALL-E', 'Stable Diffusion'],
+  // Зареждаме статистиките
+  const { data: statsData, isLoading } = useGetList<StatsRecord>('stats', {
+    pagination: { page: 1, perPage: 1 },
+    sort: { field: 'id', order: 'DESC' }
+  });
+
+  const stats = statsData?.[0]?.stats;
+
+  // Зареждаме последните активности
+  const { data: activities } = useGetList<UserActivity>('activities', {
+    pagination: { page: 1, perPage: 10 },
+    sort: { field: 'created_at', order: 'DESC' }
+  });
+
+  // Данни за графиката
+  const chartData = {
+    labels: Object.keys(stats?.promptsPerCategory || {}),
     datasets: [
       {
-        label: 'Number of Prompts',
-        data: [850, 620, 1200, 750, 980],
-        backgroundColor: [
-          alpha(theme.palette.primary.main, 0.6),
-          alpha(theme.palette.secondary.main, 0.6),
-          alpha(theme.palette.success.main, 0.6),
-          alpha(theme.palette.warning.main, 0.6),
-          alpha(theme.palette.info.main, 0.6),
-        ],
+        label: 'Prompts per Category',
+        data: Object.values(stats?.promptsPerCategory || {}),
+        backgroundColor: theme.palette.primary.main,
+        borderRadius: 8,
       },
     ],
   };
 
-  // Данни за продажбите по дни
-  const salesData: ChartProps = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-    datasets: [
-      {
-        label: 'Sales',
-        data: [12, 19, 3, 5, 2, 3, 15],
-        borderColor: theme.palette.primary.main,
-        backgroundColor: alpha(theme.palette.primary.main, 0.1),
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false,
       },
-    ],
+      title: {
+        display: true,
+        text: 'Prompts by Category',
+        font: {
+          size: 16,
+          weight: 'bold' as const,
+        },
+        padding: 20,
+      },
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: {
+          display: false,
+        },
+      },
+      x: {
+        grid: {
+          display: false,
+        },
+      },
+    },
   };
 
-  // Данни за активните потребители
-  const activeUsers: ChartProps = {
-    labels: ['Active', 'Inactive'],
-    datasets: [
-      {
-        data: [75, 25],
-        backgroundColor: [
-          theme.palette.success.main,
-          alpha(theme.palette.grey[500], 0.2),
-        ],
-      },
-    ],
-  };
+  if (isLoading) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom fontWeight="bold">
-        Dashboard
+      {/* Заглавие */}
+      <Typography variant="h4" gutterBottom fontWeight="bold" color="primary">
+        Dashboard Overview
       </Typography>
 
-      {/* Quick Stats */}
-      <Box sx={{ mb: 3 }}>
-        <Grid container spacing={3}>
-          <Grid xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="subtitle2">
-                  Total Prompts
-                </Typography>
-                <Typography variant="h4" fontWeight="bold">
-                  4,400
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="subtitle2">
-                  Total Users
-                </Typography>
-                <Typography variant="h4" fontWeight="bold">
-                  1,234
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="subtitle2">
-                  Monthly Revenue
-                </Typography>
-                <Typography variant="h4" fontWeight="bold">
-                  $12,345
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid xs={12} sm={6} md={3}>
-            <Card>
-              <CardContent>
-                <Typography color="textSecondary" variant="subtitle2">
-                  Active Subscriptions
-                </Typography>
-                <Typography variant="h4" fontWeight="bold">
-                  456
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
+      {/* Статистики */}
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} md={4}>
+          <StatsCard
+            title="Total Users"
+            value={stats?.totalUsers || 0}
+            subtitle={`+${stats?.newUsersToday || 0} today`}
+            icon={<PeopleIcon />}
+            trend={+15}
+          />
         </Grid>
-      </Box>
+        <Grid item xs={12} md={4}>
+          <StatsCard
+            title="Total Prompts"
+            value={stats?.totalPrompts || 0}
+            subtitle="Across all categories"
+            icon={<CodeIcon />}
+            trend={+25}
+          />
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <StatsCard
+            title="Active Users"
+            value={stats?.activeUsers || 0}
+            subtitle="In last 24 hours"
+            icon={<TrendingUpIcon />}
+            trend={+8}
+          />
+        </Grid>
+      </Grid>
 
-      {/* Charts */}
+      {/* Графики и активност */}
       <Grid container spacing={3}>
-        <Grid xs={12} md={8}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Prompts by AI Model
-              </Typography>
-              <Bar data={promptsByModel} />
-            </CardContent>
-          </Card>
+        <Grid item xs={12} md={8}>
+          <Box
+            sx={{
+              p: 3,
+              height: 400,
+              bgcolor: 'background.paper',
+              borderRadius: 2,
+              boxShadow: theme.shadows[1],
+            }}
+          >
+            <Bar data={chartData} options={chartOptions} />
+          </Box>
         </Grid>
-        <Grid xs={12} md={4}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Active Users
-              </Typography>
-              <Pie data={activeUsers} />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid xs={12}>
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Weekly Sales
-              </Typography>
-              <Line data={salesData} />
-            </CardContent>
-          </Card>
+        <Grid item xs={12} md={4}>
+          <ActivityList activities={activities || []} />
         </Grid>
       </Grid>
     </Box>

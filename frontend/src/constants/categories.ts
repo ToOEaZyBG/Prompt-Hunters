@@ -35,6 +35,7 @@ export interface AIModel {
   name: string;
   type: 'text' | 'image';
   categories: string[];
+  variants: string[];
   stats?: {
     categories: number;
     prompts: number;
@@ -48,6 +49,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'GPT',
     type: 'text',
     categories: ['3D', 'Ads', 'AI Assistant', 'Art', 'Augmented Reality', 'Business', 'Chatbot', 'Code', 'Content Generation', 'Conversion', 'Copy', 'Data Analysis', 'Education', 'Email', 'Ethics', 'Fantasy', 'Fashion', 'Finance', 'Fix', 'Food', 'Fun', 'Funny', 'Games', 'Generation', 'Health', 'Ideas', 'Language', 'Machine Translation', 'Marketing', 'Mathematics', 'Medical Diagnosis', 'Natural Language Processing', 'Philosophy', 'Plan', 'Product', 'Prompts', 'Question Answering', 'Recommendation Systems', 'SEO', 'Sentiment Analysis', 'Social', 'Speech Recognition', 'Speech Synthesis', 'Study', 'Summarize', 'Text Classification', 'Text Generation', 'Text Summarization', 'Translate', 'Travel', 'Virtual Assistants', 'Writing'],
+    variants: ['GPT-4', 'GPT-3.5', 'GPT-3'],
     stats: {
       categories: 52,
       prompts: 850,
@@ -59,6 +61,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Claude',
     type: 'text',
     categories: ['3D', 'Ads', 'AI Assistant', 'Art', 'Business', 'Chatbot', 'Code', 'Content Generation', 'Conversion', 'Copy', 'Data Analysis', 'Education', 'Email', 'Ethics', 'Fantasy', 'Fashion', 'Finance', 'Fix', 'Food', 'Fun', 'Funny', 'Games', 'Generation', 'Health', 'Ideas', 'Language', 'Machine Translation', 'Marketing', 'Mathematics', 'Medical Diagnosis', 'Natural Language Processing', 'Philosophy', 'Plan', 'Product', 'Prompts', 'Question Answering', 'Recommendation Systems', 'SEO', 'Sentiment Analysis', 'Social', 'Speech Recognition', 'Speech Synthesis', 'Study', 'Summarize', 'Text Classification', 'Text Generation', 'Text Summarization', 'Translate', 'Travel', 'Virtual Assistants', 'Writing'],
+    variants: ['Claude 3 Opus', 'Claude 3 Sonnet', 'Claude 2'],
     stats: {
       categories: 51,
       prompts: 620,
@@ -70,6 +73,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Mistral',
     type: 'text',
     categories: ['3D', 'Ads', 'AI Assistant', 'Art', 'Business', 'Chatbot', 'Code', 'Content Generation', 'Conversion', 'Copy', 'Data Analysis', 'Education', 'Email', 'Ethics', 'Fantasy', 'Fashion', 'Finance', 'Fix', 'Food', 'Fun', 'Funny', 'Games', 'Generation', 'Health', 'Ideas', 'Language', 'Machine Translation', 'Marketing', 'Mathematics', 'Medical Diagnosis', 'Natural Language Processing', 'Philosophy', 'Plan', 'Product', 'Prompts', 'Question Answering', 'Recommendation Systems', 'SEO', 'Sentiment Analysis', 'Social', 'Speech Recognition', 'Speech Synthesis', 'Study', 'Summarize', 'Text Classification', 'Text Generation', 'Text Summarization', 'Translate', 'Travel', 'Virtual Assistants', 'Writing'],
+    variants: ['Mistral 7B', 'Mistral 8x7B', 'Mistral 8x7B-instruct'],
     stats: {
       categories: 51,
       prompts: 340,
@@ -81,6 +85,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Llama',
     type: 'text',
     categories: ['3D', 'Ads', 'AI Assistant', 'Art', 'Business', 'Chatbot', 'Code', 'Content Generation', 'Conversion', 'Copy', 'Data Analysis', 'Education', 'Email', 'Ethics', 'Fantasy', 'Fashion', 'Finance', 'Fix', 'Food', 'Fun', 'Funny', 'Games', 'Generation', 'Health', 'Ideas', 'Language', 'Machine Translation', 'Marketing', 'Mathematics', 'Medical Diagnosis', 'Natural Language Processing', 'Philosophy', 'Plan', 'Product', 'Prompts', 'Question Answering', 'Recommendation Systems', 'SEO', 'Sentiment Analysis', 'Social', 'Speech Recognition', 'Speech Synthesis', 'Study', 'Summarize', 'Text Classification', 'Text Generation', 'Text Summarization', 'Translate', 'Travel', 'Virtual Assistants', 'Writing'],
+    variants: ['Llama 2 7B', 'Llama 2 13B', 'Llama 2 70B'],
     stats: {
       categories: 51,
       prompts: 450,
@@ -92,6 +97,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Midjourney',
     type: 'image',
     categories: ['3D', 'Accessory', 'Ads', 'AI Art', 'Animal', 'Anime', 'Art', 'Augmented Reality', 'Avatar', 'Building', 'Business', 'Cartoon', 'Celebrity', 'Clothes', 'Cute', 'Cyberpunk', 'Deepfakes', 'Drawing', 'Drink', 'Fantasy', 'Fashion', 'Food', 'Fun', 'Funny', 'Future', 'Games', 'Generation', 'Glass', 'Graphic Design', 'Health', 'Holiday', 'Icons', 'Ideas', 'Illustration', 'Ink', 'Interiors', 'Jewelry', 'Landscape', 'Logo', 'Marketing', 'Mockup', 'Monogram', 'Monster', 'Music', 'Nature', 'Painting', 'Pattern', 'People', 'Photography', 'Pixel Art', 'Product', 'Prompts', 'Psychedelic', 'Retro', 'Scary', 'Space', 'Sport', 'Statues', 'Steampunk', 'Style Transfer', 'Study', 'Summarize', 'Synthwave', 'Texture', 'Translate', 'Travel', 'Video Generation', 'Vehicle', 'Virtual Reality', 'Wallpaper', 'Wood', 'Writing'],
+    variants: ['Midjourney 5', 'Midjourney 4', 'Midjourney 3'],
     stats: {
       categories: 71,
       prompts: 1200,
@@ -103,6 +109,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Stable Diffusion',
     type: 'image',
     categories: ['3D', 'Accessory', 'Ads', 'AI Art', 'Animal', 'Anime', 'Art', 'Augmented Reality', 'Avatar', 'Building', 'Business', 'Cartoon', 'Celebrity', 'Clothes', 'Cute', 'Cyberpunk', 'Deepfakes', 'Drawing', 'Drink', 'Fantasy', 'Fashion', 'Food', 'Fun', 'Funny', 'Future', 'Games', 'Generation', 'Glass', 'Graphic Design', 'Health', 'Holiday', 'Icons', 'Ideas', 'Illustration', 'Image Processing', 'Ink', 'Interiors', 'Jewelry', 'Landscape', 'Logo', 'Marketing', 'Mockup', 'Monogram', 'Monster', 'Music', 'Nature', 'Painting', 'Pattern', 'People', 'Photography', 'Pixel Art', 'Product', 'Prompts', 'Psychedelic', 'Retro', 'Scary', 'Space', 'Sport', 'Statues', 'Steampunk', 'Style Transfer', 'Study', 'Summarize', 'Synthwave', 'Texture', 'Translate', 'Travel', 'Video Generation', 'Vehicle', 'Virtual Reality', 'Wallpaper', 'Wood', 'Writing'],
+    variants: ['Stable Diffusion 2.1', 'Stable Diffusion 2.0', 'Stable Diffusion 1.5'],
     stats: {
       categories: 72,
       prompts: 980,
@@ -114,6 +121,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'DALL-E',
     type: 'image',
     categories: ['3D', 'Accessory', 'Ads', 'AI Art', 'Animal', 'Anime', 'Art', 'Augmented Reality', 'Avatar', 'Building', 'Business', 'Cartoon', 'Celebrity', 'Clothes', 'Cute', 'Cyberpunk', 'Deepfakes', 'Drawing', 'Drink', 'Fantasy', 'Fashion', 'Food', 'Fun', 'Funny', 'Future', 'Games', 'Generation', 'Glass', 'Graphic Design', 'Health', 'Holiday', 'Icons', 'Ideas', 'Illustration', 'Ink', 'Interiors', 'Jewelry', 'Landscape', 'Logo', 'Marketing', 'Mockup', 'Monogram', 'Monster', 'Music', 'Nature', 'Painting', 'Pattern', 'People', 'Photography', 'Pixel Art', 'Product', 'Prompts', 'Psychedelic', 'Retro', 'Scary', 'Space', 'Sport', 'Statues', 'Steampunk', 'Style Transfer', 'Study', 'Summarize', 'Synthwave', 'Texture', 'Translate', 'Travel', 'Video Generation', 'Vehicle', 'Virtual Reality', 'Wallpaper', 'Wood', 'Writing'],
+    variants: ['DALL-E 3', 'DALL-E 2', 'DALL-E 1'],
     stats: {
       categories: 71,
       prompts: 750,
@@ -125,6 +133,7 @@ export const AI_MODELS: Record<string, AIModel> = {
     name: 'Leonardo',
     type: 'image',
     categories: ['3D', 'Accessory', 'Ads', 'AI Art', 'Animal', 'Anime', 'Art', 'Augmented Reality', 'Avatar', 'Building', 'Business', 'Cartoon', 'Celebrity', 'Clothes', 'Cute', 'Cyberpunk', 'Deepfakes', 'Drawing', 'Drink', 'Fantasy', 'Fashion', 'Food', 'Fun', 'Funny', 'Future', 'Games', 'Generation', 'Glass', 'Graphic Design', 'Health', 'Holiday', 'Icons', 'Ideas', 'Illustration', 'Image Processing', 'Ink', 'Interiors', 'Jewelry', 'Landscape', 'Logo', 'Marketing', 'Mockup', 'Monogram', 'Monster', 'Music', 'Nature', 'Painting', 'Pattern', 'People', 'Photography', 'Pixel Art', 'Product', 'Prompts', 'Psychedelic', 'Retro', 'Scary', 'Space', 'Sport', 'Statues', 'Steampunk', 'Style Transfer', 'Study', 'Summarize', 'Synthwave', 'Texture', 'Translate', 'Travel', 'Video Generation', 'Vehicle', 'Virtual Reality', 'Wallpaper', 'Wood', 'Writing'],
+    variants: ['Leonardo 3.0', 'Leonardo 2.0', 'Leonardo 1.0'],
     stats: {
       categories: 72,
       prompts: 580,

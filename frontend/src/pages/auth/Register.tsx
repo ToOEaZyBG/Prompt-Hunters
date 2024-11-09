@@ -24,6 +24,7 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import { designTokens } from '../../theme/designSystem';
 import authService from '../../services/auth.service';
+import { ASSETS } from '../../constants/paths';
 
 // Схема за валидация
 const validationSchema = Yup.object({
@@ -67,24 +68,16 @@ const Register = () => {
     validationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        console.log('Attempting registration with values:', values);
-        
-        const response = await authService.register({
+        await authService.register({
           email: values.email,
           password: values.password,
           firstName: values.firstName,
           lastName: values.lastName,
         });
-
-        console.log('Registration successful:', response);
         
         navigate('/auth/login');
       } catch (error: any) {
-        console.error('Registration error:', error);
-        const errorMessage = error.response?.data?.message || 
-                            error.message || 
-                            'Registration failed';
-        setError(errorMessage);
+        setError(error.message || 'Registration failed');
       } finally {
         setSubmitting(false);
       }
@@ -105,6 +98,15 @@ const Register = () => {
         alignItems: 'center',
         py: { xs: 8, md: 12 },
         background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`,
+        position: 'relative',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          background: `url("${ASSETS.patterns.default}") repeat`,
+          opacity: 0.05,
+          zIndex: 1,
+        }
       }}
     >
       <Container maxWidth="sm">

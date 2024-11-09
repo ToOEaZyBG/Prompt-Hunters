@@ -13,7 +13,8 @@ import { Bar } from 'react-chartjs-2';
 import PeopleIcon from '@mui/icons-material/People';
 import CodeIcon from '@mui/icons-material/Code';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { StatsCard, ActivityList } from '../components/dashboard';
+import { StatsCard } from '../components/dashboard/StatsCard';
+import { ActivityList } from '../components/dashboard/ActivityList';
 import { StatsRecord, UserActivity } from '../types';
 
 ChartJS.register(

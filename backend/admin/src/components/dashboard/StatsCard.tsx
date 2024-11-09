@@ -1,31 +1,70 @@
 import React from 'react';
-import { Card, CardContent, Grid, Typography } from '@mui/material';
+import { Box, Card, Typography, useTheme } from '@mui/material';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import { DashboardStats } from '../../types';
 
-interface StatsCardsProps {
-  stats: DashboardStats;
+interface StatsCardProps {
+  title: string;
+  value: number;
+  subtitle: string;
+  icon: React.ReactNode;
+  trend: number;
 }
 
-export const StatsCards = ({ stats }: StatsCardsProps) => (
-  <Grid container spacing={3} mb={6}>
-    <Grid item xs={12} md={4}>
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>Total Users</Typography>
-          <Typography variant="h3">{stats?.totalUsers || 0}</Typography>
-          <Typography variant="subtitle2" color="textSecondary">
-            +{stats?.newUsersToday || 0} today
+export const StatsCard = ({ title, value, subtitle, icon, trend }: StatsCardProps) => {
+  const theme = useTheme();
+
+  return (
+    <Card
+      sx={{
+        p: 3,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        borderRadius: 2,
+        boxShadow: theme.shadows[1],
+      }}
+    >
+      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+        <Box
+          sx={{
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: theme.palette.primary.light + '20',
+            color: theme.palette.primary.main,
+            mr: 2,
+          }}
+        >
+          {icon}
+        </Box>
+        <Typography variant="h6" fontWeight="bold">
+          {title}
+        </Typography>
+      </Box>
+
+      <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
+        {value.toLocaleString()}
+      </Typography>
+
+      <Box sx={{ display: 'flex', alignItems: 'center', mt: 'auto' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            color: trend >= 0 ? theme.palette.success.main : theme.palette.error.main,
+            mr: 1,
+          }}
+        >
+          {trend >= 0 ? <TrendingUpIcon /> : <TrendingDownIcon />}
+          <Typography variant="body2" fontWeight="bold">
+            {Math.abs(trend)}%
           </Typography>
-        </CardContent>
-      </Card>
-    </Grid>
-    <Grid item xs={12} md={4}>
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>Total Prompts</Typography>
-          <Typography variant="h3">{stats?.totalPrompts || 0}</Typography>
-        </CardContent>
-      </Card>
-    </Grid>
-  </Grid>
-); 
+        </Box>
+        <Typography variant="body2" color="text.secondary">
+          {subtitle}
+        </Typography>
+      </Box>
+    </Card>
+  );
+}; 
